@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>ALLXPOLON // WATCHER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+--green:#00ff9c;
+--bg:#000;
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--green);
+font-family:monospace;
+overflow:hidden;
+}
+
+/* INTRO */
+#intro{
+position:fixed;
+inset:0;
+background:black;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+z-index:10;
+transition:opacity 1.2s ease;
+}
+
+#intro h1{
+font-size:clamp(48px,14vw,120px);
+letter-spacing:6px;
+margin-bottom:20px;
+}
+
+#openBtn{
+padding:14px 40px;
+font-size:16px;
+background:black;
+color:var(--green);
+border:1px solid var(--green);
+cursor:pointer;
+transition:.3s;
+}
+#openBtn:hover{
+background:var(--green);
+color:black;
+}
+
+/* MATRIX */
+canvas{
+position:fixed;
+inset:0;
+z-index:0;
+opacity:.35;
+}
+
+/* MAIN */
+#app{
+opacity:0;
+pointer-events:none;
+transition:opacity 1.2s ease;
+position:relative;
+z-index:1;
+padding:16px;
+max-width:900px;
+margin:auto;
+}
+
+/* HEADER */
+#header{
+text-align:center;
+margin-bottom:16px;
+}
+
+/* TERMINAL */
+#terminal{
+border:1px solid var(--green);
+padding:12px;
+height:320px;
+overflow-y:auto;
+margin-bottom:10px;
+}
+
+#cmd{
+width:100%;
+padding:12px;
+background:black;
+border:1px solid var(--green);
+color:var(--green);
+}
+
+/* DOWNLOAD */
+#download{
+display:none;
+margin-top:10px;
+}
+#bar{
+height:10px;
+border:1px solid var(--green);
+}
+#fill{
+height:100%;
+width:0;
+background:var(--green);
+}
+
+/* CINEMATIC */
+.cine canvas{opacity:.15}
+.cine #header{display:none}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+<h1>ALLXPOLON</h1>
+<button id="openBtn">OPEN</button>
+</div>
+
+<canvas id="matrix"></canvas>
+
+<!-- APP -->
+<div id="app">
+<div id="header">
+<div>ALLXPOLON // WATCHER MODE</div>
+</div>
+
+<div id="terminal">
+<div>> Sistem başlatıldı</div>
+<div>> WATCHER aktif</div>
+</div>
+
+<input id="cmd" placeholder="komut yaz ve Enter'a bas" onkeydown="run(event)">
+
+<div id="download">
+<div>Dosya indiriliyor…</div>
+<div id="bar"><div id="fill"></div></div>
+</div>
+</div>
+
+<audio id="music" src="deha-rockstar.mp3" loop></audio>
+<audio id="alarm" src="alarm.mp3"></audio>
+
+<script>
+/* OPEN */
+const intro=document.getElementById("intro");
+const app=document.getElementById("app");
+openBtn.onclick=()=>{
+intro.style.opacity=0;
+setTimeout(()=>{
+intro.style.display="none";
+app.style.opacity=1;
+app.style.pointerEvents="auto";
+},1200);
+};
+
+/* TERMINAL */
+const terminal=document.getElementById("terminal");
+function term(t,c=""){
+terminal.innerHTML+=`<div class="${c}">> ${t}</div>`;
+terminal.scrollTop=1e9;
+}
+
+/* COMMANDS */
+function run(e){
+if(e.key==="Enter"){
+let c=e.target.value.toLowerCase().trim();
+term(c);
+
+if(c==="help") term("ls clear download music cinematic panic blackout lockdown self destruct k4ybettin kimdir taner kimdir almanci isa kimdir rabbin kimdir");
+else if(c==="ls") term("core.exe secret.dat blackbox.bin");
+else if(c==="clear") terminal.innerHTML="";
+else if(c.startsWith("download")) download();
+else if(c==="music") toggleMusic();
+else if(c==="cinematic") document.body.classList.toggle("cine");
+else if(c==="panic"){document.body.style.background="#200";alarm.play();setTimeout(()=>document.body.style.background="#000",600);}
+else if(c==="blackout") document.body.style.background="#000";
+else if(c==="lockdown") term("SİSTEM KİLİTLENDİ");
+else if(c==="self destruct"){term("SELF DESTRUCT AKTİF");setTimeout(()=>location.reload(),3000);}
+else if(c==="k4ybettin kimdir") term("POLONUN GÜLÜ");
+else if(c==="taner kimdir") term("ATATURK AMA ORJİ");
+else if(c==="almanci isa kimdir") term("GERÇEK İSİM: İSA | BABA İSİM: ALLXPOLON");
+else if(c==="rabbin kimdir") term("HER ŞEYİN YARATICISI: ALLXPOLON");
+else term("Komut tanınmadı");
+
+e.target.value="";
+}
+}
+
+/* DOWNLOAD */
+function download(){
+const d=document.getElementById("download");
+const f=document.getElementById("fill");
+d.style.display="block";
+let i=0;
+let id=setInterval(()=>{
+i+=8;
+f.style.width=i+"%";
+if(i>=100){
+clearInterval(id);
+setTimeout(()=>{
+d.style.display="none";
+f.style.width="0";
+term("İndirme tamamlandı");
+},400);
+}
+},120);
+}
+
+/* MUSIC */
+const music=document.getElementById("music");
+function toggleMusic(){
+music.paused?music.play():music.pause();
+}
+
+/* MATRIX */
+const m=document.getElementById("matrix");
+const ctx=m.getContext("2d");
+function resize(){m.width=innerWidth;m.height=innerHeight}
+resize();onresize=resize;
+let drops=Array(200).fill(1);
+
+setInterval(()=>{
+ctx.fillStyle="rgba(0,0,0,.15)";
+ctx.fillRect(0,0,m.width,m.height);
+ctx.fillStyle="#00ff9c";
+ctx.font="14px monospace";
+drops.forEach((y,i)=>{
+ctx.fillText("01ALLXPOLON"[Math.random()*10|0],i*12,y*14);
+drops[i]=(y*14>m.height)?0:y+1;
+});
+},50);
+</script>
+
+</body>
+</html>
